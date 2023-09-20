@@ -3,6 +3,7 @@ var gTTs = require('gtts');
 var token = '6334213874:AAHeF0iZRj7BCPE0odUAFkx9672I4yywEk4';
 var bot = new TelegramBot(token, { polling: true});
 var userID;
+const fs = require('fs');
 var lang = "en";
 var i = 1;
 
@@ -44,14 +45,13 @@ bot.onText(/ukrainian/, (msg) => {
 bot.onText(/\/tospeech (.+)/, (msg, match) => {
     userID = msg.chat.id;
     var gtts = new gTTs(match[1], lang);
-    gtts.save(`#${i}.mp3`);
+    gtts.save(`#${msg.from.username}.mp3`);
     setTimeout(() => {
-        bot.sendVoice(userID, `#${i}.mp3`, { reply_to_message_id: msg.message_id});
-        i++;
-        if (i == 101) {
-            i = 1;
-        }
-    }, 4000);
+        bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id});
+    }, 1000);
+    setTimeout(()=>{
+        fs.unlinkSync(`#${msg.from.username}.mp3`);
+    });
 });
 
 bot.onText(/\/tospeech\s*$/, (msg) => {
