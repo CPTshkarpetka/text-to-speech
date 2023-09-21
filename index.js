@@ -52,7 +52,7 @@ bot.onText(/\/tospeech (.+)/, (msg, match) => {
     }, 1000);
     setTimeout(()=>{
         fs.unlinkSync(`#${msg.from.username}.mp3`);
-    });
+    }, 2000);
 });
 
 bot.onText(/\/tospeech\s*$/, (msg) => {
