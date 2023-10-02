@@ -1,12 +1,22 @@
+var admin = require("firebase-admin");
+
+var serviceAccount = require("D:\\text-to-speech\\text-to-speech-node-firebase-adminsdk-q1jir-005d5e50c1.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
 var TelegramBot = require('node-telegram-bot-api');
 var gTTs = require('gtts');
+
 require('dotenv').config();
 const token = process.env.TOKEN;
+
 var bot = new TelegramBot(token, { polling: true});
 var userID;
 const fs = require('fs');
-var lang = "en";
-var i = 1;
 
 bot.setMyCommands([
     { command: '/tospeech', description: "Converting text to speech" },
@@ -18,7 +28,12 @@ bot.onText(/\/start/, (msg) => {
     bot.sendMessage(userID,
         `*Welcome to this bot\\. Here you can make your text a voice message witch /tospeech \\*your text\\*
 Now 2 languages are available\: english and ukrainian\\. To switch between them use /language*`,
-        { parse_mode: "MarkdownV2" });
+        { parse_mode: "MarkdownV2" });  
+        var data ={
+            name: msg.chat.username,
+            lang: "en"
+        }
+        db.collection("users").doc(msg.chat.username).set(data);  
 })
 
 bot.onText(/\/language/, (msg) => {
@@ -33,13 +48,13 @@ bot.onText(/\/language/, (msg) => {
 
 bot.onText(/english/, (msg) => {
     userID = msg.chat.id;
-    lang = "en";
+    db.collection("users").doc(msg.chat.username).update({lang: "en"});
     bot.sendMessage(userID, "Language was set to english")
 })
 
 bot.onText(/ukrainian/, (msg) => {
     userID = msg.chat.id;
-    lang = "ru";
+    db.collection("users").doc(msg.chat.username).update({lang: "ru"});
     bot.sendMessage(userID, "Мова була змінена на українську")
 })
 
@@ -73,7 +88,6 @@ bot.onText(/\/tospeech\s*$/, (msg) => {
             }
         });
     }
-    console.log(lang);
 })
 
 
