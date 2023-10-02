@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 
-var serviceAccount = require("D:\\text-to-speech\\text-to-speech-node-firebase-adminsdk-q1jir-005d5e50c1.json");
+var serviceAccount = require("text-to-speech-node-firebase-adminsdk-q1jir-005d5e50c1.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
