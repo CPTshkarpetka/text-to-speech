@@ -18,6 +18,8 @@ var bot = new TelegramBot(token, { polling: true});
 var userID;
 const fs = require('fs');
 
+var language = "";
+
 bot.setMyCommands([
     { command: '/tospeech', description: "Converting text to speech" },
     { command: '/language', description: "Changing language of speech " }
@@ -30,10 +32,10 @@ bot.onText(/\/start/, (msg) => {
 Now 2 languages are available\: english and ukrainian\\. To switch between them use /language*`,
         { parse_mode: "MarkdownV2" });  
         var data ={
-            name: msg.chat.username,
             lang: "en"
         }
-        db.collection("users").doc(msg.chat.username).set(data);  
+        db.collection("users").doc(msg.chat.username).set(data); 
+
 })
 
 bot.onText(/\/language/, (msg) => {
@@ -60,8 +62,10 @@ bot.onText(/ukrainian/, (msg) => {
 
 bot.onText(/\/tospeech (.+)/, (msg, match) => {
     userID = msg.chat.id;
-    var gtts = new gTTs(match[1], lang);
-    gtts.save(`#${msg.from.username}.mp3`);
+    db.collection("users").doc(msg.chat.username).get().then(doc => {language = doc.data().lang});
+    setTimeout(() => {
+        var gtts = new gTTs(match[1], language);
+        gtts.save(`#${msg.from.username}.mp3`);}, 550)  
     setTimeout(() => {
         bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id});
     }, 1000);
@@ -72,22 +76,26 @@ bot.onText(/\/tospeech (.+)/, (msg, match) => {
 
 bot.onText(/\/tospeech\s*$/, (msg) => {
     userID = msg.chat.id;
-    if (lang == "ru") {
-        bot.sendMessage(userID, "Напишіть ваш текст, який потрібно озвучити одразу після /tospeech", {
-            reply_markup: {
-                force_reply:true,
-                input_field_placeholder: "/tospeech ваш текст"
-            }
-        });
-    }
-    if (lang == "en") {
-        bot.sendMessage(userID, "Write your text to voice directly after /tospeech", {
-            reply_markup: {
-                force_reply:true,
-                input_field_placeholder: "/tospeech your text"
-            }
-        });
-    }
+    db.collection("users").doc(msg.chat.username).get().then(doc => {language = doc.data().lang});
+    setTimeout(() =>{
+        if (langauge == "ru") {
+            bot.sendMessage(userID, "Напишіть ваш текст, який потрібно озвучити одразу після /tospeech", {
+                reply_markup: {
+                    force_reply:true,
+                    input_field_placeholder: "/tospeech ваш текст"
+                }
+            });
+        }
+        if (langauge == "en") {
+            bot.sendMessage(userID, "Write your text to voice directly after /tospeech", {
+                reply_markup: {
+                    force_reply:true,
+                    input_field_placeholder: "/tospeech your text"
+                }
+            });
+        }
+    },550)
+    
 })
 
 
