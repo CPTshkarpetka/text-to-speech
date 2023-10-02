@@ -90,7 +90,7 @@ bot.onText(/\/tospeech\s*$/, (msg) => {
     userID = msg.chat.id;
     db.collection("users").doc(msg.chat.username).get().then(doc => {language = doc.data().lang});
     setTimeout(() =>{
-        if (langauge == "ru") {
+        if (language == "ru") {
             bot.sendMessage(userID, "Напишіть ваш текст, який потрібно озвучити одразу після /tospeech", {
                 reply_markup: {
                     force_reply:true,
@@ -98,7 +98,7 @@ bot.onText(/\/tospeech\s*$/, (msg) => {
                 }
             });
         }
-        if (langauge == "en") {
+        if (language == "en") {
             bot.sendMessage(userID, "Write your text to voice directly after /tospeech", {
                 reply_markup: {
                     force_reply:true,
