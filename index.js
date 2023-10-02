@@ -40,13 +40,10 @@ bot.setMyCommands([
 bot.onText(/\/start/, (msg) => {
     userID = msg.chat.id;
     bot.sendMessage(userID,
-        `*Welcome to this bot\\. Here you can make your text a voice message witch /tospeech \\*your text\\*
+`*Welcome to this bot\\. Here you can make your text a voice message witch /tospeech \\*your text\\*
 Now 2 languages are available\: english and ukrainian\\. To switch between them use /language*`,
-        { parse_mode: "MarkdownV2" });  
-        var data ={
-            lang: "en"
-        }
-        db.collection("users").doc(msg.chat.username).set(data); 
+    { parse_mode: "MarkdownV2" });  
+    db.collection("users").doc(msg.from.username).set({lang: "en"}); 
 
 })
 
@@ -62,19 +59,19 @@ bot.onText(/\/language/, (msg) => {
 
 bot.onText(/english/, (msg) => {
     userID = msg.chat.id;
-    db.collection("users").doc(msg.chat.username).update({lang: "en"});
+    db.collection("users").doc(msg.from.username).update({lang: "en"});
     bot.sendMessage(userID, "Language was set to english")
 })
 
 bot.onText(/ukrainian/, (msg) => {
     userID = msg.chat.id;
-    db.collection("users").doc(msg.chat.username).update({lang: "ru"});
+    db.collection("users").doc(msg.from.username).update({lang: "ru"});
     bot.sendMessage(userID, "Мова була змінена на українську")
 })
 
 bot.onText(/\/tospeech (.+)/, (msg, match) => {
     userID = msg.chat.id;
-    db.collection("users").doc(msg.chat.username).get().then(doc => {language = doc.data().lang});
+    db.collection("users").doc(msg.from.username).get().then(doc => {language = doc.data().lang});
     setTimeout(() => {
         var gtts = new gTTs(match[1], language);
         gtts.save(`#${msg.from.username}.mp3`);}, 550)  
@@ -88,7 +85,7 @@ bot.onText(/\/tospeech (.+)/, (msg, match) => {
 
 bot.onText(/\/tospeech\s*$/, (msg) => {
     userID = msg.chat.id;
-    db.collection("users").doc(msg.chat.username).get().then(doc => {language = doc.data().lang});
+    db.collection("users").doc(msg.from.username).get().then(doc => {language = doc.data().lang});
     setTimeout(() =>{
         if (language == "ru") {
             bot.sendMessage(userID, "Напишіть ваш текст, який потрібно озвучити одразу після /tospeech", {
