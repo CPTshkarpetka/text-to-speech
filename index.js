@@ -27,6 +27,7 @@ var gTTs = require('gtts');
 const token = process.env.TOKEN;
 
 var bot = new TelegramBot(token, { polling: true});
+bot.setWebHook(process.env.URL);
 var userID;
 const fs = require('fs');
 
@@ -82,7 +83,6 @@ bot.onText(/\/tospeech (.+)/, (msg, match) => {
             }, 10);
         }, 1000);
     }, 550)  
-
 });
 
 bot.onText(/\/tospeech\s*$/, (msg) => {
