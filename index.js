@@ -37,9 +37,6 @@ const http = require('http');
 const app = require('./index.js');
 const server = http.createServer(app);
 bot.setWebHook(server);
-server.listen(port,()=>{
-    console.log(port)
-})
 
 var userID;
 const fs = require('fs');
