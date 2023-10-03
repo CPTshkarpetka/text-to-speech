@@ -31,7 +31,11 @@ var bot = new TelegramBot(token, { webHook:{
     host: "0.0.0.0"
 }
 });
-bot.setWebHook(process.env.URL);
+
+const http = require('http');
+const app = require('./index.js');
+const server = http.createServer(app);
+bot.setWebHook(server);
 
 var userID;
 const fs = require('fs');
