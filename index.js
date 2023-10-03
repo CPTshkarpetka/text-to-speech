@@ -27,7 +27,7 @@ var gTTs = require('gtts');
 const token = process.env.TOKEN;
 
 var bot = new TelegramBot(token, { webHook:{
-    port: process.env.PORT,
+    port: process.env.PORT || 5000,
     host: "0.0.0.0"
 }
 });
