@@ -21,6 +21,11 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
+const Promise = require('bluebird');
+  Promise.config({
+    cancellation: true
+});
+
 var TelegramBot = require('node-telegram-bot-api');
 var gTTs = require('gtts');
 
@@ -104,7 +109,6 @@ bot.onText(/\/tospeech\s*$/, (msg) => {
             });
         }
     },550)
-    
 })
 
 
