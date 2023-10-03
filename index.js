@@ -21,11 +21,6 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const Promise = require('bluebird');
-  Promise.config({
-    cancellation: true
-});
-
 var TelegramBot = require('node-telegram-bot-api');
 var gTTs = require('gtts');
 
@@ -79,13 +74,15 @@ bot.onText(/\/tospeech (.+)/, (msg, match) => {
     db.collection("users").doc(msg.from.username).get().then(doc => {language = doc.data().lang});
     setTimeout(() => {
         var gtts = new gTTs(match[1], language);
-        gtts.save(`#${msg.from.username}.mp3`);}, 550)  
-    setTimeout(() => {
-        bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id});
-    }, 1000);
-    setTimeout(()=>{
-        fs.unlinkSync(`#${msg.from.username}.mp3`);
-    }, 2000);
+        gtts.save(`#${msg.from.username}.mp3`);
+        setTimeout(() => {
+            bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id});
+            setTimeout(()=>{
+                fs.unlinkSync(`#${msg.from.username}.mp3`);
+            }, 10);
+        }, 1000);
+    }, 550)  
+
 });
 
 bot.onText(/\/tospeech\s*$/, (msg) => {
