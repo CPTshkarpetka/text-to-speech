@@ -26,7 +26,11 @@ var gTTs = require('gtts');
 
 const token = process.env.TOKEN;
 
-var bot = new TelegramBot(token, { polling: true});
+var bot = new TelegramBot(token, { polling: {
+    params: {
+        timeout: 1000
+    }
+}});
 var userID;
 const fs = require('fs');
 
