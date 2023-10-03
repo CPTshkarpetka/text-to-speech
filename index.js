@@ -33,10 +33,10 @@ var bot = new TelegramBot(token, {
 }
 });
 
-const http = require('http');
+/*const http = require('http');
 const app = require('./index.js');
-const server = http.createServer(app);
-bot.setWebHook(server);
+const server = http.createServer(app);*/
+bot.setWebHook("https://text-to-speech-vasiuk-inc.onrender.com");
 
 var userID;
 const fs = require('fs');
