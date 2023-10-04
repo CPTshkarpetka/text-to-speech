@@ -28,11 +28,10 @@ const token = process.env.TOKEN;
 
 var bot = new TelegramBot(token, { webHook:{
     host:"0.0.0.0",
-    port: process.env.PORT || 5000,
-    https: process.env.URL
+    port: process.env.PORT || 5000
 }});
 
-//bot.setWebHook(process.env.URL);
+botot.setWebHook(process.env.URL);
 
 var userID;
 const fs = require('fs');
