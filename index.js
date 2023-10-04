@@ -1,4 +1,5 @@
 require('dotenv').config();
+process.env["NTBA_FIX_350"] = 1;
 var admin = require("firebase-admin");
 
 var serviceAccount = {
