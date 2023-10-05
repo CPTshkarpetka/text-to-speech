@@ -79,7 +79,7 @@ bot.onText(/ukrainian/, (msg) => {
 bot.onText(/\/tospeech (.+)/, (msg, match) => {
     userID = msg.chat.id;
     db.collection("users").doc(msg.from.username).get().then(doc => {language = doc.data().lang});
-        var gtts = new gTTs(match[1], language);
+        var gtts = new gTTs(match[1].replace(/\s\s+/g, ' '), language);
         gtts.save(`#${msg.from.username}.mp3`);
         setTimeout(() => {
             bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id});
