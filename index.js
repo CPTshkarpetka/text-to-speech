@@ -58,7 +58,7 @@ bot.onText(/\/language/, (msg) => {
     userID = msg.chat.id;
     bot.sendMessage(userID, "Changing language in proggres...", {
         "reply_markup": {
-            "keyboard": [["english", "ukrainian"]],
+            "keyboard": [[{text:"english"}, {text:"ukrainian"}]],
             one_time_keyboard: true
         }
     })
@@ -78,8 +78,8 @@ bot.onText(/ukrainian/, (msg) => {
 
 bot.onText(/\/tospeech (.+)/, (msg, match) => {
     userID = msg.chat.id;
-    var text = match[1]
-    console.log(match[1])
+    var text = match.input.replace(/(\r\n|\n|\r|\/tospeech)/gm, " ").replace(/\s{2,}/, "");
+    console.log(text)
     db.collection("users").doc(msg.from.username).get().then(doc => {language = doc.data().lang});
         var gtts = new gTTs(text, language);
         gtts.save(`#${msg.from.username}.mp3`);
