@@ -118,7 +118,7 @@ bot.onText(/\/tospeech\s*$/, async msg => {
             var message_to_reply = await bot.sendMessage(userID, "Write your text in reply for this message", {
                 reply_markup: {
                     force_reply: true,
-                    input_field_placeholder: "ваш текст"
+                    input_field_placeholder: "your text"
                 }
             })
             bot.onReplyToMessage(userID, message_to_reply.message_id, async (msg) => {
