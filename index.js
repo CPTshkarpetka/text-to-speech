@@ -45,7 +45,7 @@ bot.setMyCommands([
     { command: '/language', description: "Changing language of speech " }
 ])
 
-bot.on(/\/start/, (msg) => {
+bot.onText(/\/start/, (msg) => {
     userID = msg.chat.id;
     bot.sendMessage(userID,
         `*Welcome to this bot\\. Here you can make your text a voice message witch /tospeech \\*your text\\*
