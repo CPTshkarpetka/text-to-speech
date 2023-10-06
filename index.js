@@ -67,10 +67,12 @@ bot.on('callback_query', (msg)=>{
     userID = msg.message.chat.id;
     if(msg.data == "english"){
         db.collection("users").doc(msg.from.username).update({lang: "en"});
-        bot.sendMessage(userID, "Language was set to english")
+        bot.sendMessage(userID, "Language was set to english");
+        bot.deleteMessage(userID, msg.message.message_id);
     } else if(msg.data == "ukrainian"){
         db.collection("users").doc(msg.from.username).update({lang: "ru"});
-        bot.sendMessage(userID, "Мова була змінена на українську")
+        bot.sendMessage(userID, "Мова була змінена на українську");
+        bot.deleteMessage(userID, msg.message.message_id);
     }
 })
 
