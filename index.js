@@ -122,7 +122,7 @@ bot.onText(/\/tospeech\s*$/, async msg => {
                 }
             })
             bot.onReplyToMessage(userID, message_to_reply.message_id, async (msg) => {
-                var text = msg.text.replace(/\s{2,}/, "");
+                var text = msg.text.replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/, "");
                 var gtts = new gTTs(text, language);
                 gtts.save(`#${msg.from.username}.mp3`);
                 setTimeout(() => {
