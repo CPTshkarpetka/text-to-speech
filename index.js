@@ -56,24 +56,22 @@ Now 2 languages are available\: english and ukrainian\\. To switch between them 
 
 bot.onText(/\/language/, (msg) => {
     userID = msg.chat.id;
-    bot.sendMessage(userID, "Changing language in proggres...", {
+    bot.sendMessage(userID, "What language do you want to choose?", {
         "reply_markup": {
-            "keyboard": [[{text:"english"}, {text:"ukrainian"}]],
-            one_time_keyboard: true
+            "inline_keyboard": [[{text:"english", callback_data:"english"}, {text:"ukrainian",callback_data:"ukrainian"}]]
         }
     })
 });
 
-bot.onText(/english/, (msg) => {
-    userID = msg.chat.id;
-    db.collection("users").doc(msg.from.username).update({lang: "en"});
-    bot.sendMessage(userID, "Language was set to english")
-})
-
-bot.onText(/ukrainian/, (msg) => {
-    userID = msg.chat.id;
-    db.collection("users").doc(msg.from.username).update({lang: "ru"});
-    bot.sendMessage(userID, "Мова була змінена на українську")
+bot.on('callback_query', (msg)=>{
+    userID = msg.message.chat.id;
+    if(msg.data == "english"){
+        db.collection("users").doc(msg.from.username).update({lang: "en"});
+        bot.sendMessage(userID, "Language was set to english")
+    } else if(msg.data == "ukrainian"){
+        db.collection("users").doc(msg.from.username).update({lang: "ru"});
+        bot.sendMessage(userID, "Мова була змінена на українську")
+    }
 })
 
 bot.onText(/\/tospeech (.+)/, (msg, match) => {
