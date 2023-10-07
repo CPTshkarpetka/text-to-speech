@@ -54,13 +54,19 @@ Now 2 languages are available\: english and ukrainian\\. To switch between them 
     db.collection("users").doc(msg.from.username).set({ lang: "en" });
 })
 
-bot.onText(/\/language/, (msg) => {
+bot.onText(/\/language/, async (msg) => {
     userID = msg.chat.id;
-    bot.sendMessage(userID, "What language do you want to choose?", {
+    var deleteMessage = await bot.sendMessage(userID, "What language do you want to choose?", {
         "reply_markup": {
             "inline_keyboard": [[{ text: "english", callback_data: "english" }, { text: "ukrainian", callback_data: "ukrainian" }]]
         }
     })
+    setTimeout(async ()=>{
+        try{
+            await bot.deleteMessage(userID, deleteMessage.message_id);
+        }
+        catch(err){}
+    }, 10000)
 });
 
 bot.on('callback_query', (msg) => {
