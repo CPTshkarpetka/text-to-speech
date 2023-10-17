@@ -23,7 +23,8 @@ admin.initializeApp({
 const db = admin.firestore();
 
 var TelegramBot = require('node-telegram-bot-api');
-var gTTs = require('gtts');
+const textToSpeech = require('@google-cloud/text-to-speech');
+const client = new textToSpeech.TextToSpeechClient();
 
 const token = process.env.TOKEN;
 
@@ -34,8 +35,8 @@ var bot = new TelegramBot(token, { webHook:{
 
 bot.setWebHook(process.env.URL);
 
-
 const fs = require('fs');
+const util = require('util');
 
 var userID;
 var language;
@@ -51,7 +52,7 @@ bot.onText(/\/start/, (msg) => {
         `*Welcome to this bot\\. Here you can make your text a voice message witch /tospeech \\*your text\\*
 Now 2 languages are available\: english and ukrainian\\. To switch between them use /language*`,
         { parse_mode: "MarkdownV2" });
-    db.collection("users").doc(msg.from.username).set({ lang: "en" });
+    db.collection("users").doc(msg.from.username).set({ lang: "uk-UA" });
 })
 
 bot.onText(/\/language/, async (msg) => {
@@ -61,22 +62,22 @@ bot.onText(/\/language/, async (msg) => {
             "inline_keyboard": [[{ text: "english", callback_data: "english" }, { text: "ukrainian", callback_data: "ukrainian" }]]
         }
     })
-    setTimeout(async ()=>{
-        try{
+    setTimeout(async () => {
+        try {
             await bot.deleteMessage(userID, deleteMessage.message_id);
         }
-        catch(err){}
+        catch (err) { }
     }, 10000)
 });
 
 bot.on('callback_query', (msg) => {
     userID = msg.message.chat.id;
     if (msg.data == "english") {
-        db.collection("users").doc(msg.from.username).update({ lang: "en" });
+        db.collection("users").doc(msg.from.username).update({ lang: "en-US" });
         bot.sendMessage(userID, "Language was set to english");
         bot.deleteMessage(userID, msg.message.message_id);
     } else if (msg.data == "ukrainian") {
-        db.collection("users").doc(msg.from.username).update({ lang: "ru" });
+        db.collection("users").doc(msg.from.username).update({ lang: "uk-UA" });
         bot.sendMessage(userID, "Мова була змінена на українську");
         bot.deleteMessage(userID, msg.message.message_id);
     }
@@ -86,23 +87,29 @@ bot.onText(/\/tospeech (.+)/, (msg, match) => {
     userID = msg.chat.id;
     var text = match.input.replace(/(\r\n|\n|\r|\/tospeech)/gm, " ").replace(/\s{2,}/, "");
     db.collection("users").doc(msg.from.username).get().then(doc => { language = doc.data().lang });
-    setTimeout(()=>{
-        var gtts = new gTTs(text, language);
-        gtts.save(`#${msg.from.username}.mp3`);
+    setTimeout(async () => {
+        const request = {
+            input: { text: text },
+            voice: { languageCode: language, ssmlGender: 'FEMALE' },
+            audioConfig: { audioEncoding: 'MP3' }
+        }
+        const [response] = await client.synthesizeSpeech(request);
+        const writeFile = util.promisify(fs.writeFile);
+        await writeFile(`#${msg.from.username}.mp3`, response.audioContent, 'binary');
         setTimeout(() => {
             bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id });
             setTimeout(() => {
                 fs.unlinkSync(`#${msg.from.username}.mp3`);
             }, 10);
         }, 1000);
-    }, 550)  
+    }, 550)
 });
 
 bot.onText(/\/tospeech\s*$/, async msg => {
     userID = msg.chat.id;
     db.collection("users").doc(msg.from.username).get().then(doc => { language = doc.data().lang });
-    setTimeout(async ()=>{
-        if(language == "ru"){
+    setTimeout(async () => {
+        if (language == "uk-UA") {
             var message_to_reply = await bot.sendMessage(userID, "Введіть ваш текст у відповідь на це повідомлення", {
                 reply_markup: {
                     force_reply: true,
@@ -111,8 +118,14 @@ bot.onText(/\/tospeech\s*$/, async msg => {
             })
             bot.onReplyToMessage(userID, message_to_reply.message_id, async (msg) => {
                 var text = msg.text.replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/, "");
-                var gtts = new gTTs(text, language);
-                gtts.save(`#${msg.from.username}.mp3`);
+                const request = {
+                    input: { text: text },
+                    voice: { languageCode: language, ssmlGender: 'FEMALE' },
+                    audioConfig: { audioEncoding: 'MP3' }
+                }
+                const [response] = await client.synthesizeSpeech(request);
+                const writeFile = util.promisify(fs.writeFile);
+                await writeFile(`#${msg.from.username}.mp3`, response.audioContent, 'binary');
                 setTimeout(() => {
                     bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id });
                     setTimeout(() => {
@@ -120,7 +133,7 @@ bot.onText(/\/tospeech\s*$/, async msg => {
                     }, 10);
                 }, 1000);
             });
-        } else if(language == "en"){
+        } else if (language == "en-US") {
             var message_to_reply = await bot.sendMessage(userID, "Write your text in reply for this message", {
                 reply_markup: {
                     force_reply: true,
@@ -129,8 +142,14 @@ bot.onText(/\/tospeech\s*$/, async msg => {
             })
             bot.onReplyToMessage(userID, message_to_reply.message_id, async (msg) => {
                 var text = msg.text.replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/, "");
-                var gtts = new gTTs(text, language);
-                gtts.save(`#${msg.from.username}.mp3`);
+                const request = {
+                    input: { text: text },
+                    voice: { languageCode: language, ssmlGender: 'FEMALE' },
+                    audioConfig: { audioEncoding: 'MP3' }
+                }
+                const [response] = await client.synthesizeSpeech(request);
+                const writeFile = util.promisify(fs.writeFile);
+                await writeFile(`#${msg.from.username}.mp3`, response.audioContent, 'binary');
                 setTimeout(() => {
                     bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id });
                     setTimeout(() => {
@@ -139,9 +158,8 @@ bot.onText(/\/tospeech\s*$/, async msg => {
                 }, 1000);
             });
         }
-    }, 550)         
+    }, 550)
 })
-
 
 
 
