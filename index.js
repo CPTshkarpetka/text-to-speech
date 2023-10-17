@@ -46,7 +46,7 @@ bot.onText(/\/language/, async (msg) => {
     userID = msg.chat.id;
     var deleteMessage = await bot.sendMessage(userID, "What language do you want to choose?", {
         "reply_markup": {
-            "inline_keyboard": [[{ text: "english", callback_data: "english" }, { text: "ukrainian", callback_data: "ukrainian" }]]
+            "inline_keyboard": [[{ text: "english", callback_data: "english" }, { text: "ukrainian", callback_data: "ukrainian" }, { text: "indian", callback_data:"indian"}]]
         }
     })
     setTimeout(async () => {
@@ -66,6 +66,10 @@ bot.on('callback_query', (msg) => {
     } else if (msg.data == "ukrainian") {
         db.collection("users").doc(msg.from.username).update({ lang: "uk-UA" });
         bot.sendMessage(userID, "Мова була змінена на українську");
+        bot.deleteMessage(userID, msg.message.message_id);
+    } else if (msg.data == "turkish") {
+        db.collection("users").doc(msg.from.username).update({ lang: "ta-IN" });
+        bot.sendMessage(userID, "Indian ulalalallalala");
         bot.deleteMessage(userID, msg.message.message_id);
     }
 })
@@ -132,6 +136,30 @@ bot.onText(/\/tospeech\s*$/, async msg => {
                 const request = {
                     input: { text: text },
                     voice: { languageCode: language, ssmlGender: 'FEMALE' },
+                    audioConfig: { audioEncoding: 'MP3' }
+                }
+                const [response] = await client.synthesizeSpeech(request);
+                const writeFile = util.promisify(fs.writeFile);
+                await writeFile(`#${msg.from.username}.mp3`, response.audioContent, 'binary');
+                setTimeout(() => {
+                    bot.sendVoice(userID, `#${msg.from.username}.mp3`, { reply_to_message_id: msg.message_id });
+                    setTimeout(() => {
+                        fs.unlinkSync(`#${msg.from.username}.mp3`);
+                    }, 10);
+                }, 1000);
+            });
+        } else if (language == "ta-IN") {
+            var message_to_reply = await bot.sendMessage(userID, "Write your text in reply for this message (I am indian monkey)", {
+                reply_markup: {
+                    force_reply: true,
+                    input_field_placeholder: "your text"
+                }
+            })
+            bot.onReplyToMessage(userID, message_to_reply.message_id, async (msg) => {
+                var text = msg.text.replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/, "");
+                const request = {
+                    input: { text: text },
+                    voice: { languageCode: language, ssmlGender: 'MALE' },
                     audioConfig: { audioEncoding: 'MP3' }
                 }
                 const [response] = await client.synthesizeSpeech(request);
