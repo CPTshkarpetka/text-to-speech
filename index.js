@@ -2,7 +2,7 @@ require('dotenv').config();
 process.env["NTBA_FIX_350"] = 1;
 var admin = require("firebase-admin");
 
-var serviceAccount = process.env.FIREBASE_CREDENTIALS;
+var serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
