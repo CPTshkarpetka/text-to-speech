@@ -67,7 +67,7 @@ bot.on('callback_query', (msg) => {
         db.collection("users").doc(msg.from.username).update({ lang: "uk-UA" });
         bot.sendMessage(userID, "Мова була змінена на українську");
         bot.deleteMessage(userID, msg.message.message_id);
-    } else if (msg.data == "turkish") {
+    } else if (msg.data == "indian") {
         db.collection("users").doc(msg.from.username).update({ lang: "ta-IN" });
         bot.sendMessage(userID, "Indian ulalalallalala");
         bot.deleteMessage(userID, msg.message.message_id);
